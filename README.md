@@ -156,9 +156,9 @@ notification-service/
 **David Melendez**  
 Senior Software Engineer | Backend Specialist
 
-- Portfolio: [codebymelendez.com](https://codebymelendez.dev)
-- LinkedIn: [linkedin.com/in/dmelendez](https://linkedin.com/in/dmelendez)
-- GitHub: [github.com/dmelendez](https://github.com/dmelendez)
+- Portfolio: [codebymelendez.com](https://codebymelendez.com)
+- LinkedIn: [linkedin.com/in/ramonmelendezjuarez](https://linkedin.com/in/ramonmelendezjuarez)
+- GitHub: [github.com/dmelendez](https://github.com/codebymelendez)
 
 ## 📄 Licencia
 
