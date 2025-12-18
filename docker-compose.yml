@@ -1,0 +1,94 @@
+# =====================================================
+# NOTIFICATION SERVICE - Docker Compose
+# =====================================================
+# Uso:
+#   Levantar infraestructura: docker-compose up -d postgres rabbitmq
+#   Levantar todo:            docker-compose up -d
+#   Ver logs:                 docker-compose logs -f app
+#   Detener:                  docker-compose down
+#   Limpiar todo:             docker-compose down -v
+
+version: '3.8'
+
+services:
+  # ==================== Aplicación ====================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:postgresql://postgres:5432/notifications
+      DB_USERNAME: app
+      DB_PASSWORD: secret
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - notification-network
+    restart: unless-stopped
+
+  # ==================== PostgreSQL ====================
+  postgres:
+    image: postgres:15-alpine
+    container_name: notification-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: notifications
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d notifications"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - notification-network
+    restart: unless-stopped
+
+  # ==================== RabbitMQ ====================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: notification-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - notification-network
+    restart: unless-stopped
+
+# ==================== Volumes ====================
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+# ==================== Networks ====================
+networks:
+  notification-network:
+    driver: bridge

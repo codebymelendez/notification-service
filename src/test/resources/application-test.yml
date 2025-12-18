@@ -1,0 +1,29 @@
+# =====================================================
+# NOTIFICATION SERVICE - Perfil TEST
+# =====================================================
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  
+  flyway:
+    enabled: false
+
+app:
+  channels:
+    email:
+      simulate-failure-rate: 0
+    sms:
+      simulate-failure-rate: 0
+  
+  retry:
+    max-attempts: 3
+
+logging:
+  level:
+    root: WARN
+    dev.codebymelendez: INFO
+    org.springframework.amqp: WARN
+    org.testcontainers: INFO
